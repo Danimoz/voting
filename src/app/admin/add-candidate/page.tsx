@@ -25,10 +25,6 @@ export default function NewCandidate() {
           <label htmlFor="description" className="block font-normal mb-1">Description</label>
           <input type="text" name='description' id="description" className="p-3 w-full border border-blue-500 rounded-md" placeholder="Enter Candidate Description" required />
         </div>
-        <div className="mb-8">
-          <label htmlFor="image" className="block font-normal mb-1">Image</label>
-          <input type="file" accept='image/*' name='image' id="image" className="p-3 w-full border border-blue-500 rounded-md" required />
-        </div>
 
         <SubmitButton />
       </form>
