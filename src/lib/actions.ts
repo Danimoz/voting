@@ -71,6 +71,7 @@ export async function getCandidates() {
 }
 
 
+
 export async function voteForCandidate(userId: string, candidateId: number){
   const session = await getServerSession(options);
   try {
