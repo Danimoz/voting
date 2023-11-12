@@ -46,7 +46,6 @@ export async function addCandidate(formData: FormData){
   const image = formData.get('image') as File
   
   try {
-    const data = candidateSchema.parse({ name, description, image })
     const bytes = await image.arrayBuffer();
     const buffer = Buffer.from(bytes)
 
