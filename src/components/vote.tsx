@@ -32,7 +32,6 @@ export default function Vote({ candidateId, candidateName }: VoteProps){
       }
     }
   }
-  
 
   return (
     <div className='my-4 flex justify-center'>
