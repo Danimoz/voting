@@ -43,22 +43,11 @@ export async function createUser(formData: FormData) {
 export async function addCandidate(formData: FormData){
   const name = formData.get('name') as string
   const description = formData.get('description') as string
-  const image = formData.get('image') as File
   
   try {
-    const bytes = await image.arrayBuffer();
-    const buffer = Buffer.from(bytes)
-
-    const tempdir = os.tmpdir();
-    const uploadDir = path.join(tempdir, `${image.name}`)
-    fs.writeFile(uploadDir, buffer)
-
-    const imageUrl = await cloudinary.uploader.upload(uploadDir, { folder: 'voting' })
-    fs.unlink(uploadDir)
-
     await prisma.candidate.create({
       data: {
-        name, description, image: imageUrl.secure_url
+        name, description, image: ''
       }
     })
   } catch (error) {
