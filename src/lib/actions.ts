@@ -3,13 +3,10 @@
 import { getErrorMessage } from "./getErrorMessage";
 import prisma from "./prisma";
 import { hash } from "bcrypt";
-import fs from 'fs/promises';
-import os from 'os'
-import path from "path";
 import { v2 as cloudinary } from 'cloudinary'
-import { candidateSchema } from "./schemas";
 import { getServerSession } from "next-auth";
 import { options } from "@/app/api/auth/[...nextauth]/options";
+import { revalidatePath } from "next/cache";
 
 cloudinary.config({ 
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
@@ -50,6 +47,7 @@ export async function addCandidate(formData: FormData){
         name, description, image: ''
       }
     })
+    revalidatePath('/')
   } catch (error) {
     return {
       error: getErrorMessage(error)
@@ -77,15 +75,35 @@ export async function voteForCandidate(userId: string, candidateId: number){
   try {
     if (!session) throw 'Login to Vote'
     if (!userId) throw 'Login to Vote'
-    const user = await prisma.user.findUnique({
-      where: { email: userId }
-    })
-    console.log(userId)
     await prisma.vote.create({
       data: { userId: userId, candidateId }
     })
+    revalidatePath('/admin/view-result')
   } catch(error) {
     console.log(error)
+    return {
+      error: getErrorMessage(error)
+    }
+  }
+}
+
+
+export async function getRankings(){
+  try {
+    const candidates = await prisma.candidate.findMany({
+      include: {
+        Vote: true
+      }
+    })
+    
+    const amountOfVoteForCandidate = candidates.map((candidate) => ({
+      ...candidate, voteCount: candidate.Vote.length
+    }))
+
+    const candidatesRankedByVotes = amountOfVoteForCandidate.sort((a, b) => b.voteCount - a.voteCount)
+    return candidatesRankedByVotes
+    
+  } catch(error) {
     return {
       error: getErrorMessage(error)
     }
