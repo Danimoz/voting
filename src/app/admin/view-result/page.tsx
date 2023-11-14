@@ -9,7 +9,7 @@ export default async function ViewResult() {
 
       <div className="flex flex-col">
         {!('error' in candidates) && candidates.map((candidate) => (
-          <div className=" p-2 border-b-2 shadow flex justify-between">
+          <div key={candidate.id} className=" p-2 border-b-2 shadow flex justify-between">
             <h2>{candidate.name}</h2>
             <h2>{candidate.voteCount}</h2>
           </div>
