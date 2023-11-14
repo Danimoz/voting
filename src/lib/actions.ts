@@ -3,16 +3,10 @@
 import { getErrorMessage } from "./getErrorMessage";
 import prisma from "./prisma";
 import { hash } from "bcrypt";
-import { v2 as cloudinary } from 'cloudinary'
 import { getServerSession } from "next-auth";
 import { options } from "@/app/api/auth/[...nextauth]/options";
 import { revalidatePath } from "next/cache";
 
-cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
 
 export async function createUser(formData: FormData) {
   const firstName = formData.get('firstName') as string
