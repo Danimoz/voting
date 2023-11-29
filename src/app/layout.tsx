@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   description: 'Ceiling Challenge',
 }
 
+export const revalidate = 0 // revalidate at most every hour
+
 export default function RootLayout({ children, }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
