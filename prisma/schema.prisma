@@ -17,29 +17,14 @@ model User {
   email     String @unique
   password  String
   role      Role   @default(USER)
-  Vote      Vote[]
 
   @@map("users")
 }
 
-model Vote {
-  id          Int       @id @default(autoincrement())
-  userId      String
-  user        User      @relation(fields: [userId], references: [email])
-  candidateId Int
-  candidate   Candidate @relation(fields: [candidateId], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@unique([userId])
-}
-
 model Candidate {
-  id          Int    @id @default(autoincrement())
-  name        String
-  image       String
-  description String
-  Vote        Vote[]
+  id    Int    @id @default(autoincrement())
+  name  String
+  count Int    @default(0)
 }
 
 enum Role {

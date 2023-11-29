@@ -1,46 +1,28 @@
 'use client';
 
-import { voteForCandidate } from "@/lib/actions";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { updateScore } from "@/lib/actions";
 import { toast } from "sonner";
 
-type VoteProps = {
-  candidateId: number
-  candidateName: string
-}
-
-
-export default function Vote({ candidateId, candidateName }: VoteProps){
-  const { data: session, status } = useSession();
-  const router = useRouter();
-
-  useEffect(()=> {
-    if (status === 'unauthenticated') router.push('/login')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status])
-
-  async function handleVote() {
-    const consent = confirm(`Are you sure you want to Vote for ${candidateName}?`);
-    if (consent) {
-      const res = await voteForCandidate(session?.user.email as string, candidateId);
-      if (res?.error) {
-        toast.error(res.error);
-      } else {
-        toast.success('Successfully Voted');
-      }
+export default function UpdateCount({ id }: { id: number }) {
+  const handleUpdateCount = (id: number) => async () => {
+    const newScore = Number(prompt('Enter new score'));
+    if (!newScore || newScore < 0 || isNaN(newScore)) {
+      alert('Invalid score');
+      return
     }
+    const res = await updateScore(id, newScore)
+    if (res?.error) toast.error(res.error)
+    else toast.success('Successfully Updated')
   }
-
+  
   return (
-    <div className='my-4 flex justify-center'>
+    <div>
       <button 
-        className='px-8 py-2 bg-blue-500 rounded'
-        onClick={handleVote}
+        className="rounded-xl shadow-xl px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white"
+        onClick={handleUpdateCount(id)}
       >
-        Vote!
-      </button>
+      Update Count
+    </button>
     </div>
   )
 }

@@ -3,8 +3,6 @@
 import { getErrorMessage } from "./getErrorMessage";
 import prisma from "./prisma";
 import { hash } from "bcrypt";
-import { getServerSession } from "next-auth";
-import { options } from "@/app/api/auth/[...nextauth]/options";
 import { revalidatePath } from "next/cache";
 
 
@@ -33,13 +31,25 @@ export async function createUser(formData: FormData) {
 
 export async function addCandidate(formData: FormData){
   const name = formData.get('name') as string
-  const description = formData.get('description') as string
   
   try {
     await prisma.candidate.create({
-      data: {
-        name, description, image: ''
-      }
+      data: {name}
+    })
+    revalidatePath('/')
+  } catch (error) {
+    return {
+      error: getErrorMessage(error)
+    }
+  }
+}
+
+
+export async function updateScore(id: number, score: number) {
+  try {
+    await prisma.candidate.update({
+      where: { id: Number(id) },
+      data: { count: Number(score) }
     })
     revalidatePath('/')
   } catch (error) {
@@ -53,7 +63,6 @@ export async function addCandidate(formData: FormData){
 export async function getCandidates() {
   try {
     const candidates = await prisma.candidate.findMany({})
-    console.log(candidates)
     return candidates
   } catch(error) {
     return {
@@ -62,44 +71,3 @@ export async function getCandidates() {
   }
 }
 
-
-
-export async function voteForCandidate(userId: string, candidateId: number){
-  const session = await getServerSession(options);
-  try {
-    if (!session) throw 'Login to Vote'
-    if (!userId) throw 'Login to Vote'
-    await prisma.vote.create({
-      data: { userId: userId, candidateId }
-    })
-    revalidatePath('/admin/view-result')
-  } catch(error) {
-    console.log(error)
-    return {
-      error: getErrorMessage(error)
-    }
-  }
-}
-
-
-export async function getRankings(){
-  try {
-    const candidates = await prisma.candidate.findMany({
-      include: {
-        Vote: true
-      }
-    })
-    
-    const amountOfVoteForCandidate = candidates.map((candidate) => ({
-      ...candidate, voteCount: candidate.Vote.length
-    }))
-
-    const candidatesRankedByVotes = amountOfVoteForCandidate.sort((a, b) => b.voteCount - a.voteCount)
-    return candidatesRankedByVotes
-    
-  } catch(error) {
-    return {
-      error: getErrorMessage(error)
-    }
-  }
-}
